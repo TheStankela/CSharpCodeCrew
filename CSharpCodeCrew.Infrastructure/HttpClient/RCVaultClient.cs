@@ -1,8 +1,9 @@
-﻿using CSharpCodeCrew.Models;
+﻿using CSharpCodeCrew.Domain.Models;
 using CSharpCodeCrew.Settings;
 using Microsoft.Extensions.Options;
+using System.Net.Http.Json;
 
-namespace CSharpCodeCrew.HttpClients
+namespace CSharpCodeCrew.Application
 {
     public interface IRCVaultClient
     {
@@ -18,14 +19,9 @@ namespace CSharpCodeCrew.HttpClients
             _options = options;
             _httpClient.BaseAddress = new Uri(_options.Value.ApiUrl);
         }
-        public async Task<IEnumerable<TimeEntry>> GetTimeEntries() {
-            var res = await _httpClient.GetFromJsonAsync<IEnumerable<TimeEntry>>($"gettimeentries?code={_options.Value.AppKey}")!;
-            return res;
-        }
-
-        public void Dispose()
-        {
+        public Task<IEnumerable<TimeEntry>> GetTimeEntries() =>
+            _httpClient.GetFromJsonAsync<IEnumerable<TimeEntry>>($"gettimeentries?code={_options.Value.AppKey}")!;
+        public void Dispose() =>
             _httpClient.Dispose();
-        }
     }
 }

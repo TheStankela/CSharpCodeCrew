@@ -1,8 +1,7 @@
-using CSharpCodeCrew.HttpClients;
-using CSharpCodeCrew.Interfaces;
+using CSharpCodeCrew.Application;
+using CSharpCodeCrew.Domain.Interfaces;
 using CSharpCodeCrew.Services;
 using CSharpCodeCrew.Settings;
-using Microsoft.Extensions.Options;
 
 namespace CSharpCodeCrew
 {
@@ -17,19 +16,21 @@ namespace CSharpCodeCrew
             builder.Services.Configure<RemoteApiSettings>(
                 builder.Configuration.GetSection(nameof(RemoteApiSettings)));
 
-            builder.Services.AddHttpClient<RCVaultClient>();
-            builder.Services.AddSingleton<IRCVaultClient, RCVaultClient>();
-            builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+            builder.Services.Configure<LocalApiSettings>(
+                builder.Configuration.GetSection(nameof(LocalApiSettings)));
 
-            // Add services to the container.
+            builder.Services.AddHttpClient<RCVaultClient>();
+            builder.Services.AddHttpClient<LocalApiClient>();
+
+            builder.Services.AddSingleton<IRCVaultClient, RCVaultClient>();
+            builder.Services.AddSingleton<ILocalApiClient, LocalApiClient>();
+            builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 

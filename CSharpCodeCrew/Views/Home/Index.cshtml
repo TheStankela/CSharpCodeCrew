@@ -1,23 +1,27 @@
-﻿@model IEnumerable<Employee>
+﻿@model IEnumerable<CSharpCodeCrew.Domain.Models.Employee>
 
 @{
     ViewData["Title"] = "Home Page";
 }
-
-<table class="table table-bordered max-w-md mx-auto">
-    <thead>
-        <tr class="bg-lightRed">
-            <th scope="col" class="text-center">@Html.DisplayName("Name")</th>
-            <th scope="col" class="text-center">@Html.DisplayName("Total Time in Month")</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach(var employee in Model)
-        {
-            <tr class="@(employee.TotalTime < 100 ? "bg-red" : "")">
-                <td scope="row">@employee.Name</td>
-                <td scope="row" class="text-center">@employee.TotalTime hrs</td>
+<div>
+    <table class="table table-bordered max-w-md mx-auto">
+        <thead>
+            <tr class="bg-lightRed">
+                <th scope="col" class="text-center">@Html.DisplayName("Name")</th>
+                <th scope="col" class="text-center">@Html.DisplayName("Total Time in Month")</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach(var employee in Model)
+            {
+                <tr class="@(employee.TotalTime < 100 ? "bg-red" : "")">
+                    <td scope="row">@employee.Name</td>
+                    <td scope="row" class="text-center">@employee.TotalTime hrs</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="my-3 max-w-md mx-auto text-right">
+    <a asp-asp-controller="Home" asp-action="GetPieChart" class="btn btn-outline-danger" download="pie_chart">Get Pie Chart</a>
+</div>

@@ -1,26 +1,33 @@
-﻿using CSharpCodeCrew.HttpClients;
-using CSharpCodeCrew.Interfaces;
-using CSharpCodeCrew.Models;
+﻿using CSharpCodeCrew.Application;
+using CSharpCodeCrew.Domain.Interfaces;
+using CSharpCodeCrew.Domain.Models;
+using Newtonsoft.Json;
 
 namespace CSharpCodeCrew.Services
 {
     public class EmployeeService : IEmployeeService
     {
         private readonly IRCVaultClient _rcVaultClient;
-        public EmployeeService(IRCVaultClient rcVaultClient)
+        private readonly ILocalApiClient _localApiClient;
+        public EmployeeService(IRCVaultClient rcVaultClient, ILocalApiClient localApiClient)
         {
             _rcVaultClient = rcVaultClient;
+            _localApiClient = localApiClient;
         }
-
         public async Task<IEnumerable<Employee>> GetEmployees()
         {
             var timeEntries = await _rcVaultClient.GetTimeEntries();
 
-            var employees = MapToDisplayModel(timeEntries).Where(x => x.Name != null).OrderByDescending(x => x.TotalTime);
+            var employees = MapToDisplayModel(timeEntries.Where(x => x.EmployeeName != null))
+                                                         .OrderByDescending(x => x.TotalTime);
 
             return employees;
         }
-
+        public async Task<Stream> GetPieChart()
+        {
+            var employees = await GetEmployees();
+            return await _localApiClient.GetPieChart(JsonConvert.SerializeObject(employees));
+        }
         private List<Employee> MapToDisplayModel(IEnumerable<TimeEntry> timeEntries)
         {
             var employeeDictionary = new Dictionary<string, Employee>();
@@ -51,7 +58,6 @@ namespace CSharpCodeCrew.Services
                 TotalTime = Math.Round(employee.TotalTime)
             }).ToList();
         }
-
         private decimal CalculateTimeDifference(DateTime startTime, DateTime endTime)
         {
             if (startTime < endTime)

@@ -1,4 +1,4 @@
-using CSharpCodeCrew.Interfaces;
+using CSharpCodeCrew.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CSharpCodeCrew.Controllers
@@ -14,6 +14,12 @@ namespace CSharpCodeCrew.Controllers
         {
             var employees = await _employeeService.GetEmployees();
             return View(employees);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetPieChart()
+        {
+            var file = await _employeeService.GetPieChart();
+            return File(file, "image/png");
         }
     }
 }
